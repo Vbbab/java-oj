@@ -1,7 +1,9 @@
 import java.util.*;
 
-
-public class Problem{
+/**
+ * TODO: implement TestCase
+ */
+public class Problem {
      private int id;
      private ArrayList<String> tc = new ArrayList<String>();
 
@@ -21,17 +23,17 @@ public class Problem{
      public String getTestCase(int i){
          return tc.get(i);
      }
-     public static void main(String[] args){
+     /*public static void main(String[] args){
         //Problem list = new Problem(45, ["a","b","c","d"]);
-        
-
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        list.add("d");
+        Problem prob = new Problem(987654, list);
+        System.out.println(prob.getID());
+        System.out.println(prob.getNumTC());
+        System.out.println(prob.getTestCase(0));
      }
+     */
 }
-
-/*public class CountingProblem extends Problem {
-    public CountingProblem() {
-        super(3, new ArrayList());
-    }
-}*/
-
-// Sample change
