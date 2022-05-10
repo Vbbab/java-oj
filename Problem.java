@@ -3,6 +3,8 @@ import java.util.*;
 /**
  * TODO: implement TestCase
  */
+ // Represents a Problem which contains TestCases
+ // Change Strings to TestCases
 public class Problem {
      private int id;
      private ArrayList<String> tc = new ArrayList<String>();
