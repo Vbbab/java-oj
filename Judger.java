@@ -9,6 +9,16 @@ import java.util.concurrent.*; // Time limits stuff
 public class Judger {
     private Judger() {}
 
+    /**
+     * Runs the given binary, passing input from {@code in}. <br><br>
+     * 
+     * [TODO] add lang parameter, read conf? (Languages like Python require specific commands to exec code)
+     * 
+     * @param file  input file path (in tmp/bin)
+     * @param in    input string
+     * @return      output string from process
+     * @throws Exception  One of either {@link TimeoutException} or {@link IOException}, or other exceptions depending on system errors
+     */
     public static String run(String file, String in) throws Exception {
         Process p = Runtime.getRuntime().exec(Constants.BIN_DIR + file);
         OutputStream stdin = p.getOutputStream();
@@ -28,12 +38,7 @@ public class Judger {
 
         byte[] result = {0x00};
 
-        try {
-            result = f.get(Constants.MAX_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        } 
-        catch(TimeoutException tException) {
-            System.out.println("[TIMED OUT AFTER " + Constants.MAX_TIMEOUT_MILLIS / 1000 + " SECS]");
-        }
+        result = f.get(Constants.MAX_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         
         // Cleanup
         e.shutdownNow();
