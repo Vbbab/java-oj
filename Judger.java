@@ -30,7 +30,8 @@ public class Judger {
 
         try {
             result = f.get(Constants.MAX_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        } catch(TimeoutException tException) {
+        } 
+        catch(TimeoutException tException) {
             System.out.println("[TIMED OUT AFTER " + Constants.MAX_TIMEOUT_MILLIS / 1000 + " SECS]");
         }
         
