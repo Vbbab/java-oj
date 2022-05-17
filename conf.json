@@ -1,0 +1,7 @@
+{
+    "python3": {
+        "compile": "",
+        "run": "python %f",
+        "tf": 2
+    }
+}

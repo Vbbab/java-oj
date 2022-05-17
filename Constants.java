@@ -16,7 +16,7 @@ public final class Constants {
   public static final String CFG_PATH = "conf.json";
 
   /* TIME LIMIT */
-  public static final int MAX_TIMEOUT_MILLIS = 5000;
+  public static final int MAX_COMPILE_TIME = 5000;
 
   public static JSONObject CONFIG;
 
@@ -40,6 +40,8 @@ public final class Constants {
    * The following function initializes the {@code CONFIG} JSONObject. <br><br>
    * 
    * Call it in {@code main()} before attempting to read any configs.
+   * 
+   * @throws Exception  Could be file I/O related errors or {@code org.json} errors.
    */
   public static final void initConfig() throws Exception {
     String json = readFile(CFG_PATH);
