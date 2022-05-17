@@ -6,7 +6,7 @@ import org.json.*;
   * Constants (e.g. paths) used throughout the code.
  */
 public final class Constants {
-  public Constants() {}
+  private Constants() {}
 
   /* PATHS */
   public static final String TEMP_DIR = "tmp/";
