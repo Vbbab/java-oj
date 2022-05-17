@@ -31,6 +31,7 @@ public class FinalProject {
         System.out.println("In: ");
         String input = "";
         while (s.hasNextLine()) input += (s.nextLine() + "\n");
+        
         s.close();
 
         System.out.println("==========");

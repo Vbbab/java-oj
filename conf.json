@@ -1,7 +1,7 @@
 {
     "python3": {
         "compile": "",
-        "run": "python %f",
+        "run": "python3 %f",
         "tf": 2
     }
 }

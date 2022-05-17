@@ -62,7 +62,6 @@ public class Judger {
         try {
             result = f.get(time, TimeUnit.MILLISECONDS);
         } catch(TimeoutException tle) {
-            System.out.println("Reached TLE point");
             e.shutdownNow();
             // In some cases when TLE occurs the I/O streams are hung and we can't close them.
             // That's fine, just kill the process itself:
