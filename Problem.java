@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.File;
 
 /**
 // TODO: implement TestCase
@@ -7,22 +8,32 @@ import java.util.*;
  // Change Strings to TestCases
 public class Problem {
      private int id;
-     private ArrayList<String> tc = new ArrayList<String>();
+     private ArrayList<TestCase> tc = new ArrayList<TestCase>();
 
-     public Problem(int probID, ArrayList<String> cases){
+     public Problem(int probID) throws Exception {
         id = probID;
          //for(int i = 0; i<cases.size(); i++){
          //    tc.add(cases.get(i));       
          //}
-        tc = cases;
+         File directoryPath = new File("testcase/" + id);
+         int size = directoryPath.listFiles().length;
+         // size is the # of files within a certain a problem --> should be even 
+
+
+        if (size % 2 != 0) throw new Exception("Incorrect testcase data");
+        
+        for(int i = 1; i <= size / 2; i++) {
+            tc.add(new TestCase(id, i));
+        }
     }
      public int getID(){
          return id;
      }
      public int getNumTC(){
+         // # of problems within testcase folder
          return tc.size();
      }
-     public String getTestCase(int i){
+     public TestCase getTestCase(int i){
          return tc.get(i);
      }
      /*public static void main(String[] args){
