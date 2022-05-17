@@ -1,27 +1,33 @@
-import java.io.File;
+
 import java.io.IOException;
-import java.util.Scanner;
-
-
-
+import java.lang.String;
 
 public class TestCase {
-   public static void main(String args[]) throws IOException {
-      //Creating a File object for directory
-      File directoryPath = new File("testcase/1.txt");
-      //List of all files and directories
-      //testcase/p/t.in
-      File filesList[] = directoryPath.listFiles();
-     // System.out.println("List of files and directories in the specified directory:");
-     // for(File file : filesList) {
-     //    System.out.println("File name: "+file.getName());
-        
-     // }
-     Scanner sc = new Scanner(directoryPath);
-     String contents = "";
-     while (sc.hasNextLine()){
-         contents += sc.nextLine() + "\n";
-     }
-     System.out.println(contents);
+
+   private String input;
+   private String output;
+
+   public TestCase(int p, int t) throws IOException {
+      input = Constants.readFile("testcase/" + p + "/" + t + ".in");
+      output = Constants.readFile("testcase/" + p + "/" + t + ".out");
+      // input = Constants.readFile("testcase/"+ p + "/" + t+".txt");
+      // System.out.println(input);
    }
+
+   public String getInput() {
+      return input;
+   }
+
+   public String getOutput() {
+      return output;
+   }
+
+   public static void main(String args[]) throws IOException {
+      TestCase obj = new TestCase(1, 1);
+      //TestCase obj2 = new TestCase(1, 2);
+      //System.out.println(obj.getInput());
+      // System.out.println();
+      //System.out.println(obj.getOutput());
+   }
+
 }
