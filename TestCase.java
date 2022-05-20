@@ -8,17 +8,17 @@ public class TestCase {
    private String output;
 
    public TestCase(int p, int t) throws IOException {
-      input = Constants.readFile("testcase/" + p + "/" + t + ".in");
+      input = Constants.readFile("testcase/" + p + "/" + t + ".in") + "\n";
       output = Constants.readFile("testcase/" + p + "/" + t + ".out");
       // input = Constants.readFile("testcase/"+ p + "/" + t+".txt");
       // System.out.println(input);
    }
 
-   public String getInput() {
+   public String in() {
       return input;
    }
 
-   public String getOutput() {
+   public String out() {
       return output;
    }
 

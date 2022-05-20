@@ -1,6 +1,6 @@
 {
     "python3": {
-        "compile": "",
+        "compile": "xcopy %f tmp\\bin",
         "run": "python %f",
         "tf": 2
     }

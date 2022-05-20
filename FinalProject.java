@@ -1,4 +1,6 @@
+import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Main driver class
@@ -14,7 +16,7 @@ public class FinalProject {
             return;
         }
 
-        System.out.println("[OK] Loaded!");
+        System.out.println("==== java judge thing ====");
 
         Scanner s = new Scanner(System.in);
         
@@ -24,23 +26,42 @@ public class FinalProject {
         System.out.print("Lang: ");
         String lang = s.nextLine();
 
-        System.out.print("Time limit [ms]: ");
-        int tl = s.nextInt();
-        s.nextLine(); // '\n' is left in buffer
+        System.out.print("Prob: ");
+        int prob = s.nextInt();
 
-        System.out.println("In: ");
-        String input = "";
-        while (s.hasNextLine()) input += (s.nextLine() + "\n");
-        
-        s.close();
+        try{
+            // jeez multithreading all over the place
+            ExecutorService exec = Executors.newFixedThreadPool(2);
+            Callable<Void> judgeTask = new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    Judger.judge(new Problem(prob), file, lang);
+                    return null;
+                }
+            };
 
-        System.out.println("==========");
-        System.out.println("Out:");
-        try {
-            System.out.println(Judger.run(file, input, lang, tl));
+            Future<Void> f = exec.submit(judgeTask);
+
+            String currState = Judger.state.getState();
+            while(currState != "done") {
+                System.out.print(currState + "      \r");
+                currState = Judger.state.getState();
+            }
+            exec.shutdown();
+            System.out.println(currState + "      ");
+            System.out.println("\nResult=============");
+            System.out.println(Judger.state.getResult());
         } catch(Exception e) {
-            System.out.println("[-] " + e.toString());
+            System.out.println(e.toString());
         }
+        
+        System.out.print("Cleaning up... ");
+        File binDir = new File(Constants.BIN_DIR);
+        for(String binFile : binDir.list()) {
+            File currFile = new File(binDir.getPath(), binFile);
+            currFile.delete();
+        }
+        System.out.println("[ok]");
+        System.exit(0);
     }
-
 }

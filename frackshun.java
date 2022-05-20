@@ -1,3 +1,8 @@
+/**
+ * this class does something
+ * 
+ * note: i'll never understand why this is here ig ¯\_(ツ)_/¯
+ */
 public class frackshun {
     private int num = 0;
     private int den = 0;

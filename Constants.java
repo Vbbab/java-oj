@@ -30,7 +30,7 @@ public final class Constants {
     if (!f.isFile()) throw new FileNotFoundException("File doesn't exist: " + path);
     Scanner s = new Scanner(f);
     // This method guarantees all line-breaks (and entire file content) will be preserved as-is. It also avoids loops.
-    s.useDelimiter("\\z");
+    s.useDelimiter("\\Z");
     String contents = s.next();
     s.close();
     return contents;

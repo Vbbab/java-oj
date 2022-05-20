@@ -1,6 +1,5 @@
 import java.io.*;
-import java.util.*;
-import java.util.concurrent.*; // Time limits stuff
+import java.util.concurrent.*; // Multithreading, also takes care of TLE stuff
 
 import org.json.JSONException;
 
@@ -9,7 +8,31 @@ import org.json.JSONException;
  * Utility class only 
  */
 public class Judger {
-    private Judger() {}
+    private Judger() {} /* Static utility class */
+
+    /**
+     * Singleton class that can be used to get the state of the judger while
+     * it is working.
+     */
+    public static class State {
+        private State() {}
+
+        private String state, result;
+
+
+        /* Methods for Judger to use only */
+        private void setState(String s) {
+            state = s;
+        }
+        private void setResult(String s) {
+            result = s;
+        }
+
+        public String getState() { return state; }
+        public String getResult() { return result; }
+    }
+
+    public static State state = new State();
 
     /* Own private methods, undocumented, just for use in code */
     private static String getCompileCommand(String lang) throws JSONException {
@@ -41,9 +64,11 @@ public class Judger {
         } catch(JSONException jerr) {
             throw new Exception("[lang unsupported]");
         }
+
         Process p = Runtime.getRuntime().exec(command);
         OutputStream stdin = p.getOutputStream();
         InputStream stdout = p.getInputStream();
+
         stdin.write(in.getBytes());
         stdin.flush();
 
@@ -66,7 +91,11 @@ public class Judger {
             // In some cases when TLE occurs the I/O streams are hung and we can't close them.
             // That's fine, just kill the process itself:
             p.destroy();
-            return "[TLE]";
+            throw tle;
+        } catch (Exception other) {
+            e.shutdownNow();
+            p.destroy();
+            throw other;
         }
         // Cleanup
         e.shutdownNow();
@@ -105,9 +134,44 @@ public class Judger {
         try {
             future.get(Constants.MAX_COMPILE_TIME, TimeUnit.MILLISECONDS);
         } catch (TimeoutException tle) {
-            throw new Exception("[tle compilation]");
+            e.shutdownNow();
+            throw new Exception("tle compile");
+        } catch (Exception other) {
+            e.shutdownNow();
+            throw other;
         }
 
         return file;
+    }
+
+    /**
+     * Judge a problem. <br><br>
+     * Note that <strong>all</strong> of the testcases will be judged right now, even if one
+     * or more results in TLE or an exception (USACO-like behavior). Might add a config option
+     * to turn this off. <br><br>
+     * Note that this function doesn't return; however, it does modify the singleton {@code Judger.state}, which can be used
+     * to obtain the results as well as progress info while the judger is working.
+     * 
+     * @param p  The {@link Problem} being judged.
+     */
+    public static void judge(Problem p, String srcPath, String lang) throws Exception {
+        String bin = compile(srcPath, lang);
+        String result = "";
+        int id = p.getID(),
+            tcount = p.getNumTC();
+
+        for (int i = 0; i < tcount; i++) {
+            TestCase t = p.getTestCase(i);
+            try {
+                String oPut = run(bin, t.in(), lang, 1000).stripLeading().stripTrailing();
+                if (oPut.equals(t.out())) result += "*";
+                else result += "x";
+            } catch (TimeoutException tle) {
+                result += "t";
+            }
+            state.setState(id + " " + (i + 1) + "/" + tcount);
+        }
+        state.setResult(result);
+        state.setState("done");
     }
 }

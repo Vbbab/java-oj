@@ -1,9 +1,6 @@
 import java.util.*;
 import java.io.File;
 
-/**
-// TODO: implement TestCase
- */
  // Represents a Problem which contains TestCases
  // Change Strings to TestCases
 public class Problem {
@@ -17,9 +14,8 @@ public class Problem {
          //}
          File directoryPath = new File("testcase/" + id);
          int size = directoryPath.listFiles().length;
+         
          // size is the # of files within a certain a problem --> should be even 
-
-
         if (size % 2 != 0) throw new Exception("Incorrect testcase data");
         
         for(int i = 1; i <= size / 2; i++) {
