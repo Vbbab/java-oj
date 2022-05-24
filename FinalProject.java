@@ -12,56 +12,66 @@ public class FinalProject {
         try {
             Constants.initConfig();
         } catch (Exception e) {
-            System.out.println("[-] " + e.getClass().getCanonicalName() + ": Can't init config, check " + Constants.CFG_PATH + ".");
+            System.out.println("[-] " + e.getClass().getCanonicalName() + ": Can't init config, check "
+                    + Constants.CFG_PATH + ".");
             return;
         }
 
         System.out.println("==== java judge thing ====");
 
-        Scanner s = new Scanner(System.in);
-        
-        System.out.print("File: ");
-        String file = s.nextLine();
+        // Scanner s = new Scanner(System.in);
 
-        System.out.print("Lang: ");
-        String lang = s.nextLine();
+        // System.out.print("File: ");
+        // String file = s.nextLine();
 
-        System.out.print("Prob: ");
-        int prob = s.nextInt();
+        // System.out.print("Lang: ");
+        // String lang = s.nextLine();
 
-        try{
-            // jeez multithreading all over the place
-            ExecutorService exec = Executors.newFixedThreadPool(2);
-            Callable<Void> judgeTask = new Callable<Void>() {
-                @Override
-                public Void call() throws Exception {
-                    Judger.judge(new Problem(prob), file, lang);
-                    return null;
-                }
-            };
+        // System.out.print("Prob: ");
+        // int prob = s.nextInt();
+        // s.close();
 
-            Future<Void> f = exec.submit(judgeTask);
+        // try{
+        // Problem p = new Problem(prob);
+        // // jeez multithreading all over the place
+        // ExecutorService exec = Executors.newFixedThreadPool(2);
+        // Callable<Void> judgeTask = new Callable<Void>() {
+        // @Override
+        // public Void call() {
+        // try {
+        // Judger.judge(p, file, lang);
+        // } catch(Exception e) {
+        // System.out.println(e.getMessage());
+        // }
+        // return null;
+        // }
+        // };
 
-            String currState = Judger.state.getState();
-            while(currState != "done") {
-                System.out.print(currState + "      \r");
-                currState = Judger.state.getState();
-            }
-            exec.shutdown();
-            System.out.println(currState + "      ");
-            System.out.println("\nResult=============");
-            System.out.println(Judger.state.getResult());
-        } catch(Exception e) {
-            System.out.println(e.toString());
-        }
-        
-        System.out.print("Cleaning up... ");
-        File binDir = new File(Constants.BIN_DIR);
-        for(String binFile : binDir.list()) {
-            File currFile = new File(binDir.getPath(), binFile);
-            currFile.delete();
-        }
-        System.out.println("[ok]");
-        System.exit(0);
+        // exec.submit(judgeTask);
+        // int currState = Judger.state.getState();
+        // while (currState != p.getNumTC() || Judger.state.getResult() == "") {
+        // System.out.print(prob + " " + currState + "/" + p.getNumTC() + " \r");
+        // currState = Judger.state.getState();
+        // }
+        // exec.shutdown();
+        // System.out.println(currState + " ");
+        // System.out.println("\nResult=============");
+        // System.out.println(Judger.state.getResult());
+        // } catch(Exception e) {
+        // System.out.println(e.toString());
+        // }
+
+        // System.out.print("Cleaning up... ");
+        // File binDir = new File(Constants.BIN_DIR);
+        // for(String binFile : binDir.list()) {
+        // File currFile = new File(binDir.getPath(), binFile);
+        // currFile.delete();
+        // }
+        // System.out.println("[ok]");
+        // System.exit(0);
+        // }
+
+        Server.serve(8000);
+        System.out.println("Everything good! Serving at port 8080");
     }
 }

@@ -44,8 +44,18 @@ public final class Constants {
    * @throws Exception  Could be file I/O related errors or {@code org.json} errors.
    */
   public static final void initConfig() throws Exception {
-    String json = readFile(CFG_PATH);
-    CONFIG = new JSONObject(json);
+    CONFIG = loadJSON(CFG_PATH);
+  }
+
+  /**
+   * Loads a specific JSON file into a {@link JSONObject}.
+   * @param path  path to file, absolute or relative
+   * @return      JSON object
+   * @throws Exception
+   */
+  public static final JSONObject loadJSON(String path) throws Exception {
+    String json = readFile(path);
+    return new JSONObject(json);
   }
   
 }

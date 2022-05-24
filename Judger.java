@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.*;
+import java.util.Map.*;
 import java.util.concurrent.*; // Multithreading, also takes care of TLE stuff
 
 import org.json.JSONException;
@@ -17,22 +19,46 @@ public class Judger {
     public static class State {
         private State() {}
 
-        private String state, result;
-
+        private int numJobsComplete = 0;
+        private String result = "";
 
         /* Methods for Judger to use only */
-        private void setState(String s) {
-            state = s;
-        }
-        private void setResult(String s) {
-            result = s;
-        }
+        private void incState() { numJobsComplete++; }
+        private void setResult(String r) { result = r; }
 
-        public String getState() { return state; }
+        public int getState() { return numJobsComplete; }
         public String getResult() { return result; }
     }
 
     public static State state = new State();
+
+    /**
+     * Represents a single testcase runner job. Returns a pair (or, in java, a map Entry)
+     * that contains a boolean (whether not the program TLE'd), and a String (the result if no TLE).
+     */
+    private static class RunnerJob implements Callable<Entry<Boolean, String>> {
+        private String f, i, l;
+        private int timeLimit;
+
+        public RunnerJob(String file, String in, String lang, int time) {
+            f = file;
+            i = in;
+            l = lang;
+            timeLimit = time;
+        }
+
+        @Override
+        public Entry<Boolean, String> call() {
+            Entry<Boolean, String> output;
+            try {
+                output = Map.entry(true, Judger.run(f, i, l, timeLimit));
+            } catch (Exception e) {
+                output = Map.entry(false, "");
+            }
+            Judger.state.incState();
+            return output;
+        }
+    }
 
     /* Own private methods, undocumented, just for use in code */
     private static String getCompileCommand(String lang) throws JSONException {
@@ -41,6 +67,10 @@ public class Judger {
 
     private static String getRunCommand(String lang) throws JSONException {
         return Constants.CONFIG.getJSONObject(lang).getString("run");
+    }
+
+    private static int getTimeFactor(String lang) throws JSONException {
+        return Constants.CONFIG.getJSONObject(lang).getInt("tf");
     }
 
     /**
@@ -108,7 +138,7 @@ public class Judger {
 
     public static String compile(String file, String lang) throws Exception {
         File fileObj = new File(Constants.SRC_DIR + file);
-        if (!fileObj.isFile()) throw new FileNotFoundException("Source file doesn't exist");
+        if (!fileObj.isFile()) throw new FileNotFoundException("Source file doesn't exist: no " + fileObj.getAbsolutePath());
         String filePath = fileObj.getAbsolutePath();
 
         // Compiling is a lot simpler:
@@ -155,23 +185,39 @@ public class Judger {
      * @param p  The {@link Problem} being judged.
      */
     public static void judge(Problem p, String srcPath, String lang) throws Exception {
-        String bin = compile(srcPath, lang);
-        String result = "";
-        int id = p.getID(),
-            tcount = p.getNumTC();
-
-        for (int i = 0; i < tcount; i++) {
-            TestCase t = p.getTestCase(i);
-            try {
-                String oPut = run(bin, t.in(), lang, 1000).stripLeading().stripTrailing();
-                if (oPut.equals(t.out())) result += "*";
-                else result += "x";
-            } catch (TimeoutException tle) {
-                result += "t";
-            }
-            state.setState(id + " " + (i + 1) + "/" + tcount);
+        String bin;
+        try {
+            bin = compile(srcPath, lang);
+        } catch(Exception compErr) {
+            state.setResult("[tle compilation]");
+            throw compErr;
         }
+
+        int tcount = p.getNumTC();
+
+        // Set up a thread for each testcase (potentially a bad idea in the future but it's probably a good one for now)
+        ExecutorService jobPool = Executors.newFixedThreadPool(tcount + 1);
+        ArrayList<Future<Entry<Boolean, String>>> jobs = new ArrayList<Future<Entry<Boolean, String>>>(tcount);
+        for(int i = 0; i < tcount; i++) {
+            TestCase t = p.getTestCase(i);
+            jobs.add(jobPool.submit(new RunnerJob(bin, t.in(), lang, p.getTimeLimit() * getTimeFactor(lang))));
+        }
+        while (state.getState() != tcount) {
+            // Do something. For some reason,
+            // maybe since it's weird coding practice
+            // if I don't put a line here the program just freezes.
+            // perhaps it's because this loop gets optimized out by the compiler...
+            System.out.print("");
+        }
+        String result = "";
+        for(int i = 0; i < jobs.size(); i++) {
+            Entry<Boolean, String> status = jobs.get(i).get();
+            if (status.getKey()) {
+                if (status.getValue().stripTrailing().stripLeading().equals(p.getTestCase(i).out())) result += "*";
+                else result += "x";
+            } else result += "t";
+        }
+        jobPool.shutdownNow();
         state.setResult(result);
-        state.setState("done");
     }
 }

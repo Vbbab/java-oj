@@ -23,7 +23,7 @@ public class TestCase {
    }
 
    public static void main(String args[]) throws IOException {
-      TestCase obj = new TestCase(1, 1);
+      //TestCase obj = new TestCase(1, 1);
       //TestCase obj2 = new TestCase(1, 2);
       //System.out.println(obj.getInput());
       // System.out.println();
