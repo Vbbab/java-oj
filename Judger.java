@@ -17,20 +17,21 @@ public class Judger {
      * it is working.
      */
     public static class State {
-        private State() {}
+        public State() {}
 
         private int numJobsComplete = 0;
+        private int totalJobs = 0;
         private String result = "";
 
-        /* Methods for Judger to use only */
-        private void incState() { numJobsComplete++; }
-        private void setResult(String r) { result = r; }
+        public void setTotal(int t) { totalJobs = t; }
+        public void incState() { numJobsComplete++; }
+        public void setResult(String r) { result = r; }
 
+        public int getTotal() { return totalJobs; }
         public int getState() { return numJobsComplete; }
         public String getResult() { return result; }
     }
 
-    public static State state = new State();
 
     /**
      * Represents a single testcase runner job. Returns a pair (or, in java, a map Entry)
@@ -39,12 +40,14 @@ public class Judger {
     private static class RunnerJob implements Callable<Entry<Boolean, String>> {
         private String f, i, l;
         private int timeLimit;
+        private State s;
 
-        public RunnerJob(String file, String in, String lang, int time) {
+        public RunnerJob(String file, String in, String lang, int time, State state) {
             f = file;
             i = in;
             l = lang;
             timeLimit = time;
+            s = state;
         }
 
         @Override
@@ -55,7 +58,7 @@ public class Judger {
             } catch (Exception e) {
                 output = Map.entry(false, "");
             }
-            Judger.state.incState();
+            s.incState();
             return output;
         }
     }
@@ -184,7 +187,7 @@ public class Judger {
      * 
      * @param p  The {@link Problem} being judged.
      */
-    public static void judge(Problem p, String srcPath, String lang) throws Exception {
+    public static void judge(Problem p, String srcPath, String lang, State state) throws Exception {
         String bin;
         try {
             bin = compile(srcPath, lang);
@@ -194,13 +197,14 @@ public class Judger {
         }
 
         int tcount = p.getNumTC();
+        state.setTotal(tcount);
 
         // Set up a thread for each testcase (potentially a bad idea in the future but it's probably a good one for now)
         ExecutorService jobPool = Executors.newFixedThreadPool(tcount + 1);
         ArrayList<Future<Entry<Boolean, String>>> jobs = new ArrayList<Future<Entry<Boolean, String>>>(tcount);
         for(int i = 0; i < tcount; i++) {
             TestCase t = p.getTestCase(i);
-            jobs.add(jobPool.submit(new RunnerJob(bin, t.in(), lang, p.getTimeLimit() * getTimeFactor(lang))));
+            jobs.add(jobPool.submit(new RunnerJob(bin, t.in(), lang, p.getTimeLimit() * getTimeFactor(lang), state)));
         }
         while (state.getState() != tcount) {
             // Do something. For some reason,
