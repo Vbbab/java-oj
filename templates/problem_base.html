@@ -1,0 +1,300 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/fa/css/all.min.css" />
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <style>
+      /* misc problem styles */
+      hr {
+        width: 100%;
+      }
+      .result-card {
+        flex: 0 0 50px !important;
+        height: 50px !important;
+      }
+      .yes {
+        background: rgba(40, 167, 69, .3);
+      }
+      .no {
+        background: rgba(220, 53, 69, .3);
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">java-oj</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- Navbar Links -->
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/problemset.html">Problems</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Page content goes here -->
+    <main class="ml-1" style="display: flex; flex-direction: column; flex: 1">
+      <h3 class="text-center" id="title"></h3>
+      <i class="text-center" id="timelimit"></i>
+      <br />
+      <hr />
+      <!-- Status box -->
+      <div class="status-box border border-info rounded">
+        <div class="row my-1 align-items-center problem-idle" style="width: 100%; height: 50px">
+          <div class="col">
+            <p class="text-muted text-center"><i>Not submitted yet</i></p>
+          </div>
+        </div>
+        <div class="mx-3 my-3 row problem-progress" style="display: none">
+          <div class="col text-center">
+            <div class="progress">
+              <div id="problem-progress-bar" class="progress-bar" role="progressbar" aria-valuemin="0" id="progbar" style="width: 27%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mx-3 row problem-progress" style="display: none">
+          <div class="col text-center">
+            <small id="problem-progress-text">27/100</small>
+          </div>
+        </div>
+        <div class="mx-3 my-3 row justify-content-center problem-results" style="display: none">
+          <!-- Standard problem card: -->
+          <!--
+            <div class="col-4 align-items-center border rounded result-card">
+            <h3 class="text-center">*</h3>
+            </div>
+          -->
+        </div>
+      </div>
+      <hr class="status-box" />
+      <br />
+      <p id="body"></p>
+      <br />
+      <hr />
+      <form id="problem-submit" onsubmit="return false">
+        <div class="form-row">
+          <div class="col-md-4 mb-3">
+            <label for="file">Submit:</label>
+            <input name="file" id="file" type="file" class="form-control" />
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="lang">Language:</label>
+            <select name="lang" id="lang" class="form-control">
+              <option>python3</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="submit">Submit</button>
+      </form>
+    </main>
+    <script>
+      // (function () {
+      /// UTILITY METHODS
+      // Hides all elements with the given class.
+      function hideClass(c) {
+        document.querySelectorAll('.' + c).forEach(e => {
+          e.style.setProperty('display', 'none', 'important');
+        });
+      }
+      // Inverse of above.
+      function showClass(c) {
+        document.querySelectorAll('.' + c).forEach(e => {
+          e.style.display = '';
+        });
+      }
+      // Show only idle.
+      function showIdle() {
+        showClass('problem-idle');
+        hideClass('problem-progress');
+        hideClass('problem-results');
+        setStatusBoxBorderColor('info');
+      }
+      // Show only progress.
+      function showProgress() {
+        showClass('problem-progress');
+        hideClass('problem-idle');
+        hideClass('problem-results');
+        setStatusBoxBorderColor('primary');
+      }
+      // Show only results.
+      function showResults() {
+        showClass('problem-results');
+        hideClass('problem-idle');
+        hideClass('problem-progress');
+        setStatusBoxBorderColor('success');
+      }
+      // Set progress bar.
+      function setProgress(done, total) {
+        var percent = Math.floor(done / total * 100);
+        document.getElementById('problem-progress-bar').style.width = percent + "%";
+        document.getElementById('problem-progress-text').innerText = done + "/" + total;
+      }
+      // Change status box border color
+      function setStatusBoxBorderColor(type) {
+        var statusBox = document.querySelector('.status-box');
+        statusBox.classList.forEach(cls => {
+          if (cls.startsWith("border-")) {
+            statusBox.classList.remove(cls);
+          }
+        });
+        statusBox.classList.add("border-" + type);
+      }
+      // Generate a testcase status card
+      function createStatusCard(ac, textIfNotAC = "") {
+        var cardElem = new DOMParser().parseFromString(`<div><h3>*</h3></div>`, "text/html").firstChild.lastChild.firstChild;
+        var type = (ac ? "success" : "danger");
+        cardElem.classList.add("col-4", "mx-2", "my-2", "align-items-center", "border", "rounded", "result-card");
+        cardElem.children[0].classList.add("text-center");
+        cardElem.classList.add(`border-${type}`, `text-${type}`, (ac ? "yes" : "no"));
+        cardElem.children[0].innerText = (ac ? "*" : textIfNotAC);
+        return cardElem;
+      }
+      // Render results
+      function buildResults(resultStr) {
+        for(var c of resultStr) {
+          document.querySelector(".problem-results").appendChild(createStatusCard(c == "*", c));
+        }
+      }
+
+      // Load problem
+      var parts = location.href.split('?')[0].split("/"); // Filter out query params
+      var problemId;
+      if (isNaN(parseInt(parts[parts.length - 1])))
+        problemId = parts[parts.length - 2]; // Terminated by /
+      else problemId = parts[parts.length - 1];
+      var pContent = "";
+      fetch(`/getProblem?id=${problemId}`).then((res) => {
+        res.text().then((txt) => {
+          pContent = txt.replaceAll("\r\n", "\n"); // ARRRRGH MICROSOFT WINDOWS
+          var isProblem = ""; // Do we show a submit area?
+          var title = "";
+          var timeLimit = "";
+          var idx = 0;
+          while (idx < pContent.length && pContent[idx] != "\n") {
+            isProblem += pContent[idx];
+            idx++;
+          }
+          console.log(isProblem);
+          if (isNaN(parseInt(isProblem)) || !parseInt(isProblem)) {
+            // Hide submit area and status box.
+            document.getElementById("problem-submit").style.display = "none";
+            hideClass('status-box');
+          }
+          idx++;
+          while (idx < pContent.length && pContent[idx] != "\n") {
+            title += pContent[idx];
+            idx++;
+          }
+          idx++;
+          while (idx < pContent.length && pContent[idx] != "\n") {
+            timeLimit += pContent[idx];
+            idx++;
+          }
+          if (timeLimit == "Infinity")
+            document.getElementById("timelimit").style.display = "none";
+          idx++;
+          var body = pContent.substring(idx).replaceAll("\n", "<br />");
+          document.getElementById("title").innerText = title;
+          document.getElementById("timelimit").innerText =
+            "Time limit: " + timeLimit + " ms";
+          document.getElementById("body").innerHTML = body;
+        });
+      });
+
+
+      /** Check cookie to determine whether not to poll for results **/
+      if (Cookies.get('job')) renderResults();
+      function renderResults() {
+        fetch('/status', {
+          method: 'GET',
+          credentials: 'include'
+        }).then(res => {
+          res.text().then(r => {
+            if (r) {
+              // Hacky method: can we parse first character as int?
+              // This works because the return is either status string (e.g. "***...") or current state string (e.g. "1 40")
+              if (isNaN(parseInt(r[0]))) {
+                buildResults(r);
+                showResults();
+              } else {
+                showProgress();
+                r = r.split(' ').map(e => {return parseInt(e);});
+                setProgress(r[0], r[1]);
+                // We'll have to poll for updates.
+                setTimeout(renderResults, 500);
+              }
+            }
+          });
+        });
+      }
+
+      // DEBUG
+      var DEBUG_done = 0, DEBUG_total = 40;
+      function DEBUG_testSetProgress() {
+        showProgress(); // If it isn't shown
+        DEBUG_done++;
+        setProgress(DEBUG_done, DEBUG_total);
+        if (DEBUG_done < DEBUG_total) setTimeout(DEBUG_testSetProgress, 200);
+        else {
+          showResults();
+          buildResults("*****txt");
+        }
+      }
+
+      // Problem submit handler [DEBUG]
+      document.getElementById('problem-submit').onsubmit = () => {
+        const form = new FormData();
+        form.append('file', document.getElementById('file').files[0]);
+        form.append('lang', document.getElementById('lang').value);
+        form.append('prob', problemId);
+
+        fetch('/submit', {
+          method: 'post',
+          body: form
+        }).then(r => {
+          r.text().then(job => {
+            Cookies.set('job', job);
+            location.reload();
+          });
+        });
+        return false;
+      }
+
+      /** MathJax **/
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src =
+        "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"; // use the location of your MathJax
+
+      var config =
+        "MathJax.Hub.Config({" +
+        'extensions: ["tex2jax.js"],' +
+        'jax: ["input/TeX","output/HTML-CSS"]' +
+        "});" +
+        "MathJax.Hub.Startup.onload();";
+
+      if (window.opera) {
+        script.innerHTML = config;
+      } else {
+        script.text = config;
+      }
+
+      document.getElementsByTagName("head")[0].appendChild(script);
+      // })();
+    </script>
+  </body>
+</html>

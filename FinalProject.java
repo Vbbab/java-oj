@@ -74,6 +74,11 @@ public class FinalProject {
             File currFile = new File(binDir.getPath(), binFile);
             currFile.delete();
         }
+        File srcDir = new File(Constants.SRC_DIR);
+        for (String srcFile : srcDir.list()) {
+            File currFile = new File(srcDir.getPath(), srcFile);
+            currFile.delete();
+        }
         System.out.println("[ok]");
         System.exit(0);
     }

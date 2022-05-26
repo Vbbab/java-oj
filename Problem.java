@@ -16,7 +16,7 @@ public class Problem {
         // for(int i = 0; i<cases.size(); i++){
         // tc.add(cases.get(i));
         // }
-        File directoryPath = new File("testcase/" + id);
+        File directoryPath = new File(Constants.PROBLEMS_DIR + id);
         JSONObject problemConfig = Constants.loadJSON(directoryPath.getPath() + "/conf.json");
         timeLimit = problemConfig.getInt("tl");
 

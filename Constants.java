@@ -12,7 +12,7 @@ public final class Constants {
   public static final String TEMP_DIR = "tmp/";
   public static final String SRC_DIR = TEMP_DIR + "src/";
   public static final String BIN_DIR = TEMP_DIR + "bin/";
-  public static final String TC_DIR = "testcase/";
+  public static final String PROBLEMS_DIR = "problems/";
   public static final String CFG_PATH = "conf.json";
 
   /* TIME LIMIT */

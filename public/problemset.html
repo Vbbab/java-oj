@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="fa/css/all.min.css" />
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <style>
+      /* Bit of alternative styling to make list-group work with ol */
+      .list-group {
+        list-style: decimal inside;
+      }
+
+      .list-group-item {
+        display: list-item;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">java-oj</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- Navbar Links -->
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/problemset.html">Problems</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Page content goes here -->
+    <main class="ml-1">
+      <h3 class="text-center">Problems</h3>
+      <br /><br />
+
+      <!-- Problemset list, update as needed -->
+      <ol class="list-group">
+        <a href="/problem/1" class="list-group-item list-group-item-action">Sum of Numbers</a>
+      </ol>
+    </main>
+  </body>
+</html>
