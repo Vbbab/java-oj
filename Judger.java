@@ -123,7 +123,7 @@ public class Judger {
             e.shutdownNow();
             // In some cases when TLE occurs the I/O streams are hung and we can't close them.
             // That's fine, just kill the process itself:
-            p.destroy();
+            p.destroyForcibly();
             throw tle;
         } catch (Exception other) {
             e.shutdownNow();
