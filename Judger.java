@@ -200,7 +200,7 @@ public class Judger {
         state.setTotal(tcount);
 
         // Set up a thread for each testcase (potentially a bad idea in the future but it's probably a good one for now)
-        ExecutorService jobPool = Executors.newFixedThreadPool(tcount + 1);
+        ExecutorService jobPool = Executors.newFixedThreadPool(tcount + 5);
         ArrayList<Future<Entry<Boolean, String>>> jobs = new ArrayList<Future<Entry<Boolean, String>>>(tcount);
         for(int i = 0; i < tcount; i++) {
             TestCase t = p.getTestCase(i);

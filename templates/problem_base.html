@@ -217,8 +217,8 @@
 
 
       /** Check cookie to determine whether not to poll for results **/
-      if (Cookies.get('job-' + problemId)) {
-        Cookies.set('job', Cookies.get('job-' + problemId));
+      if (Cookies.get('job-'+problemId)) {
+        Cookies.set('job', Cookies.get('job-'+problemId));
         renderResults();
       }
       function renderResults() {

@@ -4,6 +4,6 @@ Product of Numbers
 Given a line of numbers, separated by spaces, find their product.
 
 <h6>Sample Input</h6>
-<code class="border rounded">1 2 3 2</code>
+<code class="border rounded">1 2 3 4</code>
 <h6>Sample Output</h6><br>
-<code class="border rounded">12</code>
+<code class="border rounded">24</code>
