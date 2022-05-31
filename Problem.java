@@ -2,7 +2,7 @@ import java.util.*;
 
 import org.json.JSONObject;
 
-import java.io.File;
+import java.io.*;
 
 // Represents a Problem which contains TestCases
 // Change Strings to TestCases

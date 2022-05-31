@@ -217,7 +217,10 @@
 
 
       /** Check cookie to determine whether not to poll for results **/
-      if (Cookies.get('job')) renderResults();
+      if (Cookies.get('job-' + problemId)) {
+        Cookies.set('job', Cookies.get('job-' + problemId));
+        renderResults();
+      }
       function renderResults() {
         fetch('/status', {
           method: 'GET',
@@ -267,7 +270,7 @@
           body: form
         }).then(r => {
           r.text().then(job => {
-            Cookies.set('job', job);
+            Cookies.set('job-' + problemId, job);
             location.reload();
           });
         });

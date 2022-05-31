@@ -1,0 +1,9 @@
+1
+Product of Numbers
+1000
+Given a line of numbers, separated by spaces, find their product.
+
+<h6>Sample Input</h6>
+<code class="border rounded">1 2 3 2</code>
+<h6>Sample Output</h6><br>
+<code class="border rounded">12</code>
